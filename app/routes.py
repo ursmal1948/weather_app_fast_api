@@ -1,5 +1,4 @@
-from fastapi import APIRouter, HTTPException
-from fastapi import Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -63,8 +62,9 @@ async def get_weather_for_cities_route(session: AsyncSession = Depends(get_sessi
         else:
             try:
                 weather_data = await get_weather_for(city.name)
-                weathers.append(weather_data)
                 await save_to_redis(cache_key, weather_data, redis)
+                weathers.append(weather_data)
+
             except HTTPException as e:
                 logging.error(f"Failed to fetch weather for {city.name}: {e.detail}")
 
@@ -86,7 +86,7 @@ async def get_weather_for_city_route_internal(session: AsyncSession = Depends(ge
     return weather_for_city
 
 
-@router.post('/api/internal/weather', response_model=WeatherData)
+@router.post('/api/internal/weather', response_model=WeatherData, status_code=status.HTTP_201_CREATED)
 async def create_weather_route(session: AsyncSession = Depends(get_session), weather: WeatherCreate | None = None):
     city_name = weather.city_name
     if not await get_city_by_name(session, city_name):
