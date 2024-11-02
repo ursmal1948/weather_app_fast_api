@@ -29,6 +29,11 @@ To stop and remove all the containers, run:
 docker-compose down
 ```
 
+To view the interactive API documentation provided by Swagger UI, run application and navigate to the following URL in your browser:
+```
+http://localhost:8000/docs
+```
+
 ## Migrations
 I have used alembic to simplify creation of tables and separate its logic from the logic of managing and manipulating data in database. 
 ### 
