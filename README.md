@@ -29,7 +29,7 @@ To stop and remove all the containers, run:
 docker-compose down
 ```
 
-To view the interactive API documentation provided by Swagger UI, run application and navigate to the following URL in your browser:
+To view the interactive API documentation provided by Swagger UI, run application and navigate to the following URL in browser:
 ```
 http://localhost:8000/docs
 ```
