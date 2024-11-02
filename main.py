@@ -1,8 +1,6 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 import uvicorn
-from redis.asyncio import Redis
 
-from app.database import get_redis
 from app.routes import router
 
 import logging
