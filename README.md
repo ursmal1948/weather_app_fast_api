@@ -1,5 +1,8 @@
-# Weather App
-![Weather Icon](weather_icon.png)
+<div align="center">
+  <img src="weather_icon.svg" alt="Weather Icon" width="100" />  
+  <h1>Weather App</h1>
+</div>
+
 ### Simple weather application that allows user to check the weather for any location, either by  providing the city or geographical coordinates. Users can choose to fetch live weather data from an external API or create their own custom weather entries, which can be saved to a database for later retrieval.
 
 ## Technologies used in the project:
