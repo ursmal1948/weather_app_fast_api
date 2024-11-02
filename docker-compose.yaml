@@ -1,5 +1,6 @@
 version: '3.8'
 
+
 services:
   mysql:
     image: mysql:latest
@@ -23,6 +24,7 @@ services:
 
   redis:
     image: redis:latest  # Use the latest Redis image from Docker Hub
+    restart: always
 
     volumes:
       - redis_data:/data  # Persist Redis data
@@ -35,8 +37,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-#      command: python main.py
-#    command: pipenv run uvicorn main:app --reload
+    #      command: python main.py
+    #    command: pipenv run uvicorn main:app --reload
     command: python main.py
     volumes:
       - ./:/webapp
