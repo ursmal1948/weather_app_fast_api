@@ -11,7 +11,7 @@ from app.crud import (
     get_weather_for_city_id,
     get_weather_from_db
 )
-from app.weather import get_weather_for
+from app.weather import get_weather_for, get_city_name_based_on_coordinates
 from app.schema import City, CreateCity, WeatherData, WeatherCreate
 
 from app.database import (
@@ -26,6 +26,19 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 router = APIRouter()
+
+
+@router.get("/api/external/weather/coordinates", response_model=WeatherCreate)
+async def get_city_based_on_coordinates(lat: float, lon: float, limit: int,
+                                        redis: Redis = Depends(get_redis)):
+    city_name = await get_city_name_based_on_coordinates(lat, lon, limit)
+    cache_key = f'weather:{city_name.lower()}'
+    if await is_stored_in_redis(cache_key, redis):
+        return await get_cached_weather(cache_key, redis)
+    weather = await get_weather_for(city_name)
+    await save_to_redis(cache_key, weather, redis)
+
+    return weather
 
 
 @router.get('/api/external/weather/cities/{city_name}', response_model=WeatherCreate)
