@@ -45,4 +45,6 @@ async def save_to_redis(key: str, data, redis_: Redis = Depends(get_redis)):
 async def get_cached_weather(key: str, redis_: Redis = Depends(get_redis)):
     cached_data = await redis_.get(key)
     cached_data_dict = json.loads(cached_data)
-    return WeatherCreate(**cached_data_dict)
+    cached_weather_entity = WeatherCreate(**cached_data_dict)
+    cached_weather_entity.convert_sunrise_and_sunset()
+    return cached_weather_entity

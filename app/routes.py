@@ -50,10 +50,14 @@ async def get_weather_for_city_route_external(
     cache_key = f'weather:{city_name.lower()}'
 
     if await is_stored_in_redis(cache_key, redis):
-        return await get_cached_weather(cache_key, redis)
+        weather = await get_cached_weather(cache_key, redis)
+        return weather
+        # return await get_cached_weather(cache_key, redis)
 
     weather = await get_weather_for(city_name)
     await save_to_redis(cache_key, weather, redis)
+    weather.convert_sunrise_and_sunset()
+
     return weather
 
 
@@ -70,12 +74,14 @@ async def get_weather_for_cities_route(session: AsyncSession = Depends(get_sessi
             data = await get_cached_weather(cache_key, redis)
             if data:
                 weathers.append(data)
+                continue
         if await is_stored_in_redis(cache_key, redis):
             weathers.append(await get_cached_weather(cache_key, redis))
         else:
             try:
                 weather_data = await get_weather_for(city.name)
                 await save_to_redis(cache_key, weather_data, redis)
+                weather_data.convert_sunrise_and_sunset()
                 weathers.append(weather_data)
 
             except HTTPException as e:
@@ -137,12 +143,18 @@ async def get_city_route(session: AsyncSession = Depends(get_session)):
     return city_entities
 
 
-@router.get('/api/weather/{city_name}', response_model=WeatherData)
+@router.get('/api/weather/{city_name}')
 async def get_weather_for_city(
         session: AsyncSession = Depends(get_session),
+        redis: Redis = Depends(get_redis),
         city_name: str | None = None):
     if not await get_city_by_name(session, city_name):
         await create_city(session, CreateCity(name=city_name))
+
+    cache_key = f'weather:{city_name.lower()}'
+
+    if await is_stored_in_redis(cache_key, redis):
+        return await get_cached_weather(cache_key, redis)
 
     weather_from_db = await get_weather_from_db(session, city_name)
 
