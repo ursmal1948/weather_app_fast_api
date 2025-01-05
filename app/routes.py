@@ -136,7 +136,7 @@ async def get_city_route(session: AsyncSession = Depends(get_session), city_id: 
 
 
 @router.get('/api/internal/cities', response_model=list[City])
-async def get_city_route(session: AsyncSession = Depends(get_session)):
+async def get_cities_route(session: AsyncSession = Depends(get_session)):
     city_entities = await get_all_cities(session)
     if city_entities is None:
         raise HTTPException(status_code=404, detail='Cities not found')
